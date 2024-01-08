@@ -22,7 +22,7 @@ except ImportError:
         pyodbc = None
 
 
-def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'):
+def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=sqlite3):
     """Open's named CSV file and uses header as column names.
     Assumes string type for all columns.
     Creates table if not present.
@@ -51,8 +51,7 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         dml_sql = 'INSERT INTO "%s" (%s) VALUES (%s)' % (table_name, column_names, qmark_bind_markers)  # this is essentially a sanity check on the names
         print(dml_sql)
 
-        # for now assume sqlite and ignore pyodbc
-        con = sqlite3.connect(connection_string)
+        con = db_driver.connect(connection_string)
         cur = con.cursor()
         cur.execute(ddl_sql)
 

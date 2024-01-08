@@ -23,12 +23,11 @@ except ImportError:
         pyodbc = None
 
 
-def dump_db_to_csv(connection_string, table_name, output_file=sys.stdout, sql=None):
+def dump_db_to_csv(connection_string, table_name, output_file=sys.stdout, sql=None, db_driver=sqlite3):
     sql = sql or 'select * from "%s"' % table_name  # potential for SQL injection shenanigans but we also support arbitary SQL to be passed in already....
     out_csv = csv.writer(output_file)
 
-    # for now assume sqlite and ignore pyodbc
-    con = sqlite3.connect(connection_string)
+    con = db_driver.connect(connection_string)
     cur = con.cursor()
     cur.execute(sql)
     column_names = list(x[0] for x in cur.description)
