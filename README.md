@@ -136,4 +136,7 @@ NOTE incomplete! Does not handle:
 
 ### Processing CSV Files Exported From Handbase For Android
 
-TODO - see notes above.
+Assuming demo above has been ran already and have a file called `demo.csv`:
+
+    python3 handbase/csv/csv2db.py demo.csv /tmp/test_delme.sqlite3 quotes
+    sqlite3 /tmp/test_delme.sqlite3 .dump
