@@ -10,6 +10,7 @@ INSERT INTO quotes (quote, nsfw) VALUES ('This is a teeny, tiny bit longer than 
 INSERT INTO quotes (quote, nsfw) VALUES ('Ready?
 Steady?
 Go!', 0);
+INSERT INTO quotes (quote, nsfw) VALUES (replace('Annother.\nNewline?\nDemo.','\n',char(10)),0);
 
 COMMIT;
 
