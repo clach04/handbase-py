@@ -59,7 +59,7 @@ Appears to be an incrementing integer, starting at `1`.
 
 ### Signature or Sketch
 
-Mono / Black and White image. Dimensions/Resolution?
+Mono / Black and White image. Dimensions/Resolution: guessing 160x160 (original Palm Pilot screen res).
 
 Whilst field/column is included in CSV always empty.
 
