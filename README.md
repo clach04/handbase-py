@@ -72,6 +72,8 @@ Float-4 Ranges seen:
 #### Pop-Up
 
 When not set, `No Value` - unclear how a string value of same text would work, presumbly treated as NULL/Empty.
+Looks like Pop-Up maybe relaetd to DB Pop-UP but this maybe two types? one a lookup the other string where appends/concatenates?
+Unclear how Linked Parent/Child work
 
 #### Check-Box
 
@@ -161,3 +163,28 @@ Assuming demo above has been ran already and have a file called `demo.csv`:
 
     python3 handbase/csv/csv2db.py demo.csv /tmp/test_delme.sqlite3 quotes
     sqlite3 /tmp/test_delme.sqlite3 .dump
+
+## HanDBase PDB
+
+  * datatypes
+      * appears to store integers as little-endian. I.e. storing 0x3eadbeef (1051573999) ends up with 0xefbead3e
+      * appears to store floats as strings
+          - still confused over ranges here and format.
+          - **Maybe** limited to 16 bytes storage (including negative sign, decimal marker (TBD, probably `.`)
+          - also need to worry about in memory representation and rounding that it performs
+      * **Assuming** pop-ups treated as integer index to Pop-Up list/array
+      * **Assuming** Check-Box treated as (single-byte) integer
+      * **TODO** date
+      * **TODO** time
+  * delete records appear to be cleared out and not left remaining in the pdb.
+  * debian file (filemagic) can not id a HanDBase pdb file, reports it as "data"
+  * head of file appears to be the database name (and some sort of meta data) in fixed format (NUL terminated/filled)
+      * `HanDHanD` at offset 0x3c (60)
+      * `HanDB` variable location, around offset 0x3c0 - 0x3d0
+          * after this section field/column metadata present
+  * there are 20 instances of a byte sequence which looks like an extract of the 7-bit US-ASCII table, but it is truncated, " !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abc"
+      * Some **maybe** related to Views/Forms?
+  * `pdblb` shows up a few times as some sort of seperator, **probably NOT** related to number of fields/columns in one table with 16-17 columns saw occurence count=11. For 2 column table (2 rows) saw 4 times.
+      * Seen within a few bytes of pop-up values list values
+      * **Consistently** seen within a few bytes of *each* row record
+      * Seen before ONE buffer of Note (2000) field data (maybe related to Signature/Drawing/Sketch)... but not consistently. Seen before empty/null Note (2000) but also NOT seen before Note (2000) buffer
