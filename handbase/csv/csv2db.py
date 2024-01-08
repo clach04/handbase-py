@@ -22,7 +22,7 @@ except ImportError:
         pyodbc = None
 
 
-def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=sqlite3):
+def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=sqlite3, ddl_sql=None, dml_sql=None):
     """Open's named CSV file and uses header as column names.
     Assumes string type for all columns.
     Creates table if not present.
@@ -41,14 +41,17 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         num_cols = len(header)
         print(header)
         print('*'*65)
-        column_ddl = ', '.join(['%s STRING' % column_name for column_name in header])
-        print(column_ddl)
-        ddl_sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, column_ddl)  # if table exists, assume correct column names (and we ignore types...)
+        if ddl_sql is None:
+            # Assume SQLite3 syntax
+            column_ddl = ', '.join(['%s STRING' % column_name for column_name in header])
+            print(column_ddl)
+            ddl_sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, column_ddl)  # if table exists, assume correct column names (and we ignore types...)
         print(ddl_sql)
-        qmark_bind_markers = ', '.join([param_marker for dummy_values in range(num_cols)])
-        column_names = ', '.join(['"%s"' % column_name for column_name in header])
-        # assume/use delimited indentifiers
-        dml_sql = 'INSERT INTO "%s" (%s) VALUES (%s)' % (table_name, column_names, qmark_bind_markers)  # this is essentially a sanity check on the names
+        if dml_sql is None:
+            qmark_bind_markers = ', '.join([param_marker for dummy_values in range(num_cols)])
+            column_names = ', '.join(['"%s"' % column_name for column_name in header])
+            # assume/use delimited indentifiers
+            dml_sql = 'INSERT INTO "%s" (%s) VALUES (%s)' % (table_name, column_names, qmark_bind_markers)  # this is essentially a sanity check on the names
         print(dml_sql)
 
         con = db_driver.connect(connection_string)

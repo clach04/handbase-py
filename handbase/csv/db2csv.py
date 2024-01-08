@@ -24,6 +24,7 @@ except ImportError:
 
 
 def dump_db_to_csv(connection_string, table_name, output_file=sys.stdout, sql=None, db_driver=sqlite3):
+    # Assume SQLite3 syntax
     sql = sql or 'select * from "%s"' % table_name  # potential for SQL injection shenanigans but we also support arbitary SQL to be passed in already....
     out_csv = csv.writer(output_file)
 
