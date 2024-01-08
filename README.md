@@ -5,7 +5,9 @@ Pure Python code for interacting with Handbase (for Android).
 The Android version of Handbase has a web interface that offers REST access to some functionality for import/export.
 
   * TODO limits
-  * Encoding; UTF-8 is **NOT** supported. Appears to be latin1 based TODO find Palm pdb notes on character sets.
+  * Encoding; UTF-8 is **NOT** supported. Appears to be latin1 **based**.
+    http://www.ddhsoftware.com/knowledgebase.html?read=378&UID=2024010800125198.35.93.189
+    claims "Windows Latin 1", this appears to be incorrect as the Euro symbol is safely stored which is not part of latin1, it came much later in cp1252 / iso 8859-15.
 
 ## Data and Fields
 
