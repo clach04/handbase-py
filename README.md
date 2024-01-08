@@ -1,6 +1,7 @@
 # handbase-py
 
-Pure Python code for interacting with Handbase (for Android).
+Pure Python 3.x and 2.x code for interacting with HanDBase (for Android).
+Home page https://github.com/clach04/handbase-py
 
 The Android version of Handbase has a web interface that offers REST access to some functionality for import/export.
 
