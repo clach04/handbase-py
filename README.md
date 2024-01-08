@@ -11,15 +11,19 @@ The Android version of Handbase has a web interface that offers REST access to s
 
 ## Data and Fields
 
+### Limits
+
+  * Maximum number of fields 100
+
 ### Datatypes
 
-### Text
+#### Text
 
 Max length 254 characters (actually bytes). Field defintion can limit length.
 
 For missing/empty, empty string is used.
 
-### Integer
+#### Integer
 
 Range appears to be:
 
@@ -28,7 +32,7 @@ Range appears to be:
 
 Can't figure this out
 
-### Float
+#### Float
 
 Appears to have an option to display digits after the decimal point, 0-4.
 
@@ -44,26 +48,25 @@ Float-4 Ranges seen:
   * -999999999999999
   * 90000000001
 
+#### Pop-Up
 
-### Pop-Up
+When not set, `No Value` - unclear how a string value of same text would work, presumbly treated as NULL/Empty.
 
-When not see, `No Value` - unclear how a string value of same text would work, presumbly treated as NULL/Empty.
-
-### Check-Box
+#### Check-Box
 
 Boolean, in CSV export string `0` is False / UnChecked and `1` is True / Checked.
 
-### UniqueLegacy
+#### UniqueLegacy
 
 Appears to be an incrementing integer, starting at `1`.
 
-### Signature or Sketch
+#### Signature or Sketch
 
 Mono / Black and White image. Dimensions/Resolution: guessing 160x160 (original Palm Pilot screen res).
 
 Whilst field/column is included in CSV always empty.
 
-### Date
+#### Date
 
 Where values can be manually or automatically set:
 
@@ -75,7 +78,7 @@ Where values can be manually or automatically set:
 Values in CSV of `No Date` indicate NULL/missing.
 Format appears to be US format, viz. MM-DD-YYYY example `01/07/2024`.
 
-### Time
+#### Time
 
 Similar to Date BUT without Current option
 
@@ -91,11 +94,11 @@ Format appears to be AM/PM based, viz. "HH:MM Xm" and whilst the form appear to 
 UNTESTED sending in 24 hour strings for Handbase to import.
 
 
-### Note
+#### Note
 
 Similar to Text but no control over max length. Supports 2000 bytes.
 
-### Heading
+#### Heading
 
 Indicates Column/Field is not used (other than a visual seperate on screen) BUT will show up in CSV export as empty value.
 
@@ -121,12 +124,14 @@ Demo SQLite3 database, exported in a format suitable for Handbase on Android to 
     ./handbase/csv/db2csv.py /tmp/somedb.sqlite3 quotes
 
 When imported using http://androidphone:8000/csv_import.html into a new table should end up with two fields named to match the original schema both set to the TEXT datatype, with max length of "quote" to 71 (which matches the max string length in the demo).
+Try updating the 2nd column type to "Check-Box".
 
 NOTE incomplete! Does not handle:
 
   * file/string encoding
   * NULL values
   * **Any datatypes**, it handles strings (and does not warn about truncation, see note about encoding) and integers to some extent (no warings about truncated/unsupported values)
+  * Maximum number of fields check
 
 
 ### Processing CSV Files Exported From Handbase For Android
