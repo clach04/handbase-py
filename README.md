@@ -112,7 +112,7 @@ Handbase expects a header line.
 
 Encoding; UTF-8 is **NOT** supported. Appears to be latin1 based TODO find Palm pdb notes on character sets.
 
-Checkbox True values are exported as `1`.
+Checkbox False values are exported as `0` and True values are exported as `1`.
 
 Python csv module `writerow()` works fine with Handbase without any extra flags.
 
