@@ -10,6 +10,26 @@ The Android version of Handbase has a web interface that offers REST access to s
     http://www.ddhsoftware.com/knowledgebase.html?read=378&UID=2024010800125198.35.93.189
     claims "Windows Latin 1", this appears to be incorrect as the Euro symbol is safely stored which is not part of latin1, it came much later in [cp1252](https://en.wikipedia.org/wiki/Windows-1252) / [iso 8859-15](https://en.wikipedia.org/wiki/ISO/IEC_8859-15).
 
+Table of Contents
+
+  * [Data and Fields](#data-and-fields)
+    + [Limits](#limits)
+    + [Datatypes](#datatypes)
+      - [Text](#text)
+      - [Integer](#integer)
+      - [Float](#float)
+      - [Pop-Up](#pop-up)
+      - [Check-Box](#check-box)
+      - [UniqueLegacy](#uniquelegacy)
+      - [Signature or Sketch](#signature-or-sketch)
+      - [Date](#date)
+      - [Time](#time)
+      - [Note](#note)
+      - [Heading](#heading)
+  * [CSV](#csv)
+    + [Generating CSV Files Suitable For Import Into Handbase For Android](#generating-csv-files-suitable-for-import-into-handbase-for-android)
+    + [Processing CSV Files Exported From Handbase For Android](#processing-csv-files-exported-from-handbase-for-android)
+
 ## Data and Fields
 
 ### Limits
