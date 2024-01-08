@@ -143,8 +143,8 @@ Python csv module `writerow()` works fine with Handbase without any extra flags.
 
 Demo SQLite3 database, exported in a format suitable for Handbase on Android to be imported via the web interface.
 
-    sqlite3 /tmp/somedb.sqlite3 < demo.sql
-    ./handbase/csv/db2csv.py /tmp/somedb.sqlite3 quotes
+    sqlite3 somedb.sqlite3 < demo.sql
+    py -3 ./handbase/csv/db2csv.py somedb.sqlite3 quotes
 
 When imported using http://androidphone:8000/csv_import.html into a new table should end up with two fields named to match the original schema both set to the TEXT datatype, with max length of "quote" to 71 (which matches the max string length in the demo).
 Try updating the 2nd column type to "Check-Box".
@@ -161,8 +161,11 @@ NOTE incomplete! Does not handle:
 
 Assuming demo above has been ran already and have a file called `demo.csv`:
 
-    python3 handbase/csv/csv2db.py demo.csv /tmp/test_delme.sqlite3 quotes
-    sqlite3 /tmp/test_delme.sqlite3 .dump
+    python handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
+    python2 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
+    python3 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
+    py -3 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
+    sqlite3 test_delme.sqlite3 .dump
 
 ## HanDBase PDB
 
