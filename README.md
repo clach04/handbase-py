@@ -113,6 +113,22 @@ Checkbox True values are exported as `1`.
 
 Python csv module `writerow()` works fine with Handbase without any extra flags.
 
-### CSV Import
-### CSV Export
+### Generating CSV Files Suitable For Import Into Handbase For Android
 
+Demo SQLite3 database, exported in a format suitable for Handbase on Android to be imported via the web interface.
+
+    sqlite3 /tmp/somedb.sqlite3 < demo.sql
+    ./handbase/csv/db2csv.py /tmp/somedb.sqlite3 quotes
+
+When imported using http://androidphone:8000/csv_import.html into a new table should end up with two fields named to match the original schema both set to the TEXT datatype, with max length of "quote" to 71 (which matches the max string length in the demo).
+
+NOTE incomplete! Does not handle:
+
+  * file/string encoding
+  * NULL values
+  * **Any datatypes**, it handles strings (and does not warn about truncation, see note about encoding) and integers to some extent (no warings about truncated/unsupported values)
+
+
+### Processing CSV Files Exported From Handbase For Android
+
+TODO - see notes above.
