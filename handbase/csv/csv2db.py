@@ -6,6 +6,7 @@
 
 """
 
+import codecs  # pre Python 3 support
 import csv
 import os
 import sqlite3
@@ -32,7 +33,8 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         * scan data keeping stats, then INSERT using best guess heuristic
         * pass in some sort of schema/mapping details
     """
-    fh = open(csv_filename, 'r', encoding="cp1252")  # FIXME py3 only
+
+    fh = codecs.open(csv_filename, 'r', encoding="cp1252")
 
     try:
         in_csv = csv.reader(fh)
