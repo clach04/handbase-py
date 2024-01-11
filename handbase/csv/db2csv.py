@@ -22,9 +22,26 @@ except ImportError:
     except ImportError:
         pyodbc = None
 
+def con2driver(connection_string):
+    if connection_string == ':memory:':
+        return sqlite3
+    # if looks like path, return sqlite3
+    # file.db
+    # .\file.db
+    # ./file.db
+    # /tmp/file.db
+    # \tmp\file.db
+    # C:\tmp\file.db
+    # Z:\tmp\file.db
+    # \\some_server\file.db
+    if '=' in connection_string:
+        return pyodbc
+    return sqlite3
 
-def dump_db_to_csv(connection_string, table_name, output_file=sys.stdout, sql=None, db_driver=sqlite3):
-    # Assume SQLite3 syntax
+def dump_db_to_csv(connection_string, table_name, output_file=sys.stdout, sql=None, db_driver=None):
+    db_driver = db_driver or con2driver(connection_string)
+
+    # Assume SQLite3 syntax; db_driver == sqlite3
     sql = sql or 'select * from "%s"' % table_name  # potential for SQL injection shenanigans but we also support arbitary SQL to be passed in already....
     out_csv = csv.writer(output_file)
 

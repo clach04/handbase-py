@@ -23,7 +23,10 @@ except ImportError:
         pyodbc = None
 
 
-def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=sqlite3, ddl_sql=None, dml_sql=None):
+from db2csv import con2driver
+
+
+def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=None, ddl_sql=None, dml_sql=None):
     """Open's named CSV file and uses header as column names.
     Assumes string type for all columns.
     Creates table if not present.
@@ -33,6 +36,7 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         * scan data keeping stats, then INSERT using best guess heuristic
         * pass in some sort of schema/mapping details
     """
+    db_driver = db_driver or con2driver(connection_string)
 
     fh = codecs.open(csv_filename, 'r', encoding="cp1252")
 
