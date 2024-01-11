@@ -51,6 +51,12 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     #print('result: %r' % result)
     return (result_filename, result)
 
+## TODO hand send_db()
+# MAX_FILE_SIZE=3000000
+# localfile
+#
+# /csv_import.html - appletname
+# /applet_add.html
 
 def main(argv=None):
     if argv is None:
