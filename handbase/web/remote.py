@@ -147,21 +147,7 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
 
     headers = {'content-type': content_type, 'content-length': len('content-length')}
     put_url(put_db_url, body, headers=headers, verb=POST)
-    # there mimetype / Content-Type
-    '''http://localhost:8000/uploadfile.html
 
-Content-Disposition: form-data; name="localfile"; filename="demo.csv"\r\nContent-Type: text/csv\r\n
-body payload: b'------WebKitFormBoundaryYh9PyfUKEduVZ1nE\r\nContent-Disposition: form-data; name="MAX_FILE_SIZE"\r\n\r\n3000000\r\n------WebKitFormBoundaryYh9PyfUKEduVZ1nE\r\nContent-Disposition: form-data; name="appletname"\r\n\r\nMyDemoCSV\r\n------WebKitFormBoundaryYh9PyfUKEduVZ1nE\r\nContent-Disposition: form-data; name="localfile"; filename="demo.csv"\r\nContent-Type: text/csv\r\n\r\nquote,nsfw\r\n"""Off with his head!"", the Queen said.",0\r\nIt\'s the luck of the Irish!,0\r\n"Expletive-deleted, expletive-deleted you expletive-deleted.",1\r\n"This is a teeny, tiny bit longer than sixty bytes/characters.",0\r\n"Ready?\r\nSteady?\r\nGo!",0\r\n"Annother.\r\nNewline?\r\nDemo.",0\r\n\r\n------WebKitFormBoundaryYh9PyfUKEduVZ1nE\r\nContent-Disposition: form-data; name="UpCSV"\r\n\r\nAdd CSV Data\r\n------WebKitFormBoundaryYh9PyfUKEduVZ1nE--\r\n'
-
-
-Content-Disposition: form-data; name="localfile"; filename="truncated_test.pdb"\r\nContent-Type: application/octet-stream\r\n
-payload: b'------WebKitFormBoundaryOLAJZSjCrK53Sqs8\r\nContent-Disposition: form-data; name="MAX_FILE_SIZE"\r\n\r\n3000000\r\n------WebKitFormBoundaryOLAJZSjCrK53Sqs8\r\nContent-Disposition: form-data; name="localfile"; filename="truncated_test.pdb"\r\nContent-Type: application/octet-stream\r\n\r\ntest\x00\x00....\r\n------WebKitFormBoundaryOLAJZSjCrK53Sqs8\r\nContent-Disposition: form-data; name="UpPDB"\r\n\r\nAdd File\r\n------WebKitFormBoundaryOLAJZSjCrK53Sqs8--\r\n'
-
-
-NON db content
-request_body is b'------WebKitFormBoundaryPorY4DxgZRva13lw\r\nContent-Disposition: form-data; name="MAX_FILE_SIZE"\r\n\r\n3000000\r\n------WebKitFormBoundaryPorY4DxgZRva13lw\r\nContent-Disposition: form-data; name="localfile"; filename="icon.png"\r\nContent-Type: image/png\r\n\r\n\x89PNG\r\n.......`\x82\r\n------WebKitFormBoundaryPorY4DxgZRva13lw\r\nContent-Disposition: form-data; name="UpPDB"\r\n\r\nAdd File\r\n------WebKitFormBoundaryPorY4DxgZRva13lw--\r\n'
-
-    '''
 
 def main(argv=None):
     if argv is None:
