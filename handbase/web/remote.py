@@ -8,6 +8,7 @@
 
 import logging
 import os
+from optparse import OptionParser
 import sys
 
 try:
@@ -22,6 +23,7 @@ except ImportError:
     from urllib import quote_plus, urlencode, urlretrieve  #TODO is this in urllib2?
     from urllib2 import build_opener, urlopen, HTTPBasicAuthHandler, HTTPDigestAuthHandler, HTTPPasswordMgrWithDefaultRealm, Request, HTTPError
 
+__version__ = '0.0.0'
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -61,10 +63,11 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     else:
         raise NotImplementedError('dbtype=%r' % dbtype)
 
-    print(get_db_url)
+    log.debug('about to get %r', get_db_url)
     f = urlopen(get_db_url)
     result = f.read()
     #print('result: %r' % result)
+    log.debug('Got %r', result)
     return (result_filename, result)
 
 
@@ -99,7 +102,9 @@ def put_url(url, data, headers=None, verb=POST):
 def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     """
     dbname - name withOUT extension
-    dbcontent - database content in bytes
+    dbcontent - database content in bytes. Either HanDBase v4.x PDB or CSV (in Windows-1252/cp1252 encoding)
+
+    TODO check header of dbcontents looks reasonable, e.g. PDB check
     """
     if not server_url.endswith('/'):
         server_url += '/'
@@ -149,39 +154,81 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     put_url(put_db_url, body, headers=headers, verb=POST)
 
 
+class MyOptionParser(OptionParser):
+    pass
+    """
+    def format_epilog(self, formatter):
+        log.debug('formatter %r', formatter)
+        log.debug('epilog %r', self.epilog)
+        #return self.expand_prog_name(self.epilog)
+        return self.epilog
+    """
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    server_url = os.environ.get('HANDBASE_URL', 'http://localhost:8000')  # alternative if not set, stop here
-    dbname = argv[1]  # looks like case may not be NOT be significant
-    dbtype = DBTYPE_CSV
-    try:
-        if argv[1].lower() == 'pdb':
-            dbtype = DBTYPE_PDB
-    except IndexError:
-        pass
+    usage = "usage: %prog [options] filename"
+    description = '''Interact with HanDBase web server
 
-    # download
-    """
-    filename, filecontents = get_db(server_url, dbname, dbtype=dbtype)
-    print((filename, filecontents))  # TODO save to disk
-    """
+Examples:
 
-    demo_csv = '''quote,nsfw
-"""Off with his head!"", the Queen said.",0
-It's the luck of the Irish!,0
-"Expletive-deleted, expletive-deleted you expletive-deleted.",1
-"This is a teeny, tiny bit longer than sixty bytes/characters.",0
-"Ready?
-Steady?
-Go!",0
-"Annother.
-Newline?
-Demo.",0
+    %prog -u mydb.pdb  # upload HandDBase db, from file mydb.pdb
+    %prog -u mydb.csv  # upload csv, from file mydb.csv - defaults database name
+    %prog -u mydb.csv -d my_db_name  # upload csv, from file mydb.csv - into specified database name
+
+    %prog  mydb.pdb  # download HandDBase db, into file mydb.pdb - defaults database name to mydb
+    %prog  mydb.csv  # download csv, into file mydb.csv - defaults database name to mydb
+    %prog  mydb.csv -d my_db_name  # download csv, into file mydb.csv - from specified database name
 '''
-    dbname = 'delete_me_upload'
-    put_db(server_url, dbname, demo_csv, dbtype=DBTYPE_CSV)
+    parser = MyOptionParser(usage=usage, version="%%prog %s" % __version__, description=description)
+    parser.add_option("-d", "--dbname", help="Database/table name, if not set defaults based on filename")
+    parser.add_option("-l", "--ls", "--list", help="List databases TODO", action="store_true")
+    parser.add_option("-u", "--upload", help="Upload a file", action="store_true")
+    parser.add_option("--url", help="Specify server URL, if not set checks HANDBASE_URL os env, defaults to http://localhost:8000")
+    parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
+
+    (options, args) = parser.parse_args(argv[1:])
+    verbose = options.verbose
+    if verbose:
+        print('Python %s on %s' % (sys.version.replace('\n', ' - '), sys.platform))
+
+    print('options: %r' % options)
+    print('args: %r' % args)
+    print('dbname: %r' % options.dbname)
+    print('ls: %r' % options.ls)
+    print('upload: %r' % options.upload)
+    print('url: %r' % options.url)
+
+    server_url = options.url or os.environ.get('HANDBASE_URL', 'http://localhost:8000')  # alternative idea; if not set, stop here
+    print('Using server: %s' % server_url)
+
+    if options.ls:
+        raise NotImplementedError('list support TODO')
+
+    filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
+    print('filename: %r' % filename)
+
+    dbname = options.dbname or filename.rsplit('.', 1)[0]
+    print('dbname: %r' % dbname)
+
+    dbtype = DBTYPE_CSV
+    if filename.lower().endswith('.pdb'):
+        dbtype = DBTYPE_PDB
+
+    #raise Shields
+    if options.upload:
+        f = open(filename, 'rb')
+        csv_bytes = f.read()
+        f.close()
+        put_db(server_url, dbname, csv_bytes, dbtype=dbtype)
+    else:  # download (default)
+        returned_filename, filecontents = get_db(server_url, dbname, dbtype=dbtype)
+        #print((filename, returned_filename, filecontents))  # TODO save to disk
+        f = open(filename, 'wb')  # user specified filename
+        f.write(filecontents)
+        f.close()
 
     return 0
 
