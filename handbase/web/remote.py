@@ -6,6 +6,7 @@
 
 """
 
+import logging
 import os
 import sys
 
@@ -20,6 +21,21 @@ except ImportError:
     from urlparse import urljoin, urlparse
     from urllib import quote_plus, urlencode, urlretrieve  #TODO is this in urllib2?
     from urllib2 import build_opener, urlopen, HTTPBasicAuthHandler, HTTPDigestAuthHandler, HTTPPasswordMgrWithDefaultRealm, Request, HTTPError
+
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+disable_logging = False
+#disable_logging = True
+if disable_logging:
+    log.setLevel(logging.NOTSET)  # only logs; WARNING, ERROR, CRITICAL
+
+ch = logging.StreamHandler()  # use stdio
+
+formatter = logging.Formatter("logging %(process)d %(thread)d %(asctime)s - %(filename)s:%(lineno)d %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+log.addHandler(ch)
+
 
 
 DBTYPE_PDB = 'PDB'
@@ -51,6 +67,29 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     #print('result: %r' % result)
     return (result_filename, result)
 
+
+POST = 'POST'
+
+def put_url(url, data, headers=None, verb=POST):
+    log.debug('put_url %s=%r', verb, url)
+    response = None
+    try:
+        if headers:
+            request = Request(url, data=data, headers=headers)
+        else:
+            request = Request(url, data=data)  # may not be needed
+        request.get_method = lambda: verb
+        response = urlopen(request)
+        url = response.geturl()  # WILL this work?
+        code = response.getcode()
+        #log("putURL [{}] response code:{}".format(url, code))
+        result = response.read()
+        return result
+    finally:
+        if response != None:
+            response.close()
+
+
 ## TODO hand send_db()
 # MAX_FILE_SIZE=3000000
 # localfile
@@ -68,21 +107,46 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     post_dict = {
         'MAX_FILE_SIZE': '3000000',
         'appletname': dbname,
-        'localfile': dbcontent,
     }
 
     if dbtype == DBTYPE_CSV:
         put_db_url = server_url + 'csv_import.html'
         post_dict['UpCSV'] = 'Add CSV Data'
-        post_dict['filename'] = dbname + CSV_EXTENSION
+        filename = dbname + CSV_EXTENSION
+        file_content_type = 'text/csv'
     elif dbtype == DBTYPE_PDB:
         put_db_url = server_url + 'applet_add.html'
         post_dict['UpPDB'] = 'Add File'
-        post_dict['filename'] = dbname + PDB_EXTENSION
+        filename = dbname + PDB_EXTENSION
+        file_content_type = 'application/octet-stream'
     else:
         raise NotImplementedError('dbtype=%r' % dbtype)
 
     print((put_db_url, dbname, dbcontent, dbtype))
+
+    bounder_mark = b'----------BOUNDARY_MARKER_GOES_HERE'
+    body_list = []
+    for key in post_dict:
+        value = post_dict[key]
+        body_list.append(b'--' + bounder_mark)
+        body_list.append(b'Content-Disposition: form-data; name="%s"' % key)
+        body_list.append(b'')
+        body_list.append(value)
+    # file
+    files = [('localfile', filename, dbcontent), ]
+    for (key, filename, value) in files:
+        body_list.append(b'--' + bounder_mark)
+        body_list.append(b'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
+        body_list.append(b'Content-Type: %s' % file_content_type)
+        body_list.append(b'')
+        body_list.append(value)
+    body_list.append('--' + bounder_mark + '--')
+    body_list.append('')
+    body = b'\r\n'.join(body_list)
+    content_type = b'multipart/form-data; boundary=%s' % bounder_mark
+
+    headers = {'content-type': content_type, 'content-length': len('content-length')}
+    put_url(put_db_url, body, headers=headers, verb=POST)
     # there mimetype / Content-Type
     '''http://localhost:8000/uploadfile.html
 
