@@ -227,6 +227,12 @@ class MyOptionParser(OptionParser):
         return self.epilog
     """
 
+def filename2dbname(filename):
+    dbname = filename.replace('\\', '/')
+    if '/' in dbname:
+        dbname = dbname.rsplit('/', 1)[1]
+    dbname = dbname.rsplit('.', 1)[0]
+    return dbname
 
 def main(argv=None):
     if argv is None:
@@ -275,7 +281,8 @@ Examples:
     filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
     print('filename: %r' % filename)
 
-    dbname = options.dbname or filename.rsplit('.', 1)[0]
+    #dbname = options.dbname or filename.rsplit('.', 1)[0]
+    dbname = options.dbname or filename2dbname(filename)
     print('dbname: %r' % dbname)
 
     dbtype = DBTYPE_CSV
