@@ -145,6 +145,7 @@ Demo SQLite3 database, exported in a format suitable for Handbase on Android to 
 
     sqlite3 somedb.sqlite3 < demo.sql
     py -3 ./handbase/csv/db2csv.py somedb.sqlite3 quotes
+    py -3 ./handbase/csv/db2csv.py somedb.sqlite3 quotes > demo.csv  # FIXME needs work under Windows, works fine under Linux
 
 When imported using http://androidphone:8000/csv_import.html into a new table should end up with two fields named to match the original schema both set to the TEXT datatype, with max length of "quote" to 71 (which matches the max string length in the demo).
 Try updating the 2nd column type to "Check-Box".
