@@ -71,6 +71,69 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     return (result_filename, result)
 
 
+def dumb_html_table_string_extract(line):
+    # line needs to contain a single line, no newlines
+    tmp_str = line[line.find('>') + 1:]
+    tmp_str = tmp_str[:tmp_str.find('<')]
+    return tmp_str
+
+def dumb_handbase_parser_printer(html):
+    """This is EXTREMELY fragile and dependent on how HanDBase 4.x under Androoud displays its index.html
+    """
+    handbase_table_start_marker = '<table'
+    handbase_table_end_marker = '</table>'
+
+    table_str = html[html.find(handbase_table_start_marker):]
+    table_str = table_str[:table_str.find(handbase_table_end_marker)]
+
+    #print('table_str %r' % table_str)
+    #print('-' * 65)
+    #print('%s' % table_str)
+    #print('-' * 65)
+    table_details = []
+    table_list = []
+    for line in table_str.split('\n'):
+        #if ' class="thbody">' in line:
+        #if ' class="tdbody">' in line:
+        if ' class="tdbody">' in line or ' class="thbody">' in line:
+            #print('%s' % line)
+            #print('%s' % dumb_html_table_string_extract(line))
+            table_details.append(dumb_html_table_string_extract(line))
+        elif '</tr>' in line:
+            header_row = False
+            if table_details == ['Database', 'Date/Time', 'File Size', 'Records', 'Download']:
+                header_row = True
+            #print(table_details)
+            tmp = table_details.pop(0)
+            table_details.append(tmp)
+            if header_row:
+                table_details[1] = '\t\t' + table_details[1]
+                del table_details[3]
+            else:
+                # TODO formatting of date into ISO
+                table_details[2] = '\t' + table_details[2]
+                table_list.append(table_details[-1])
+            #print(table_details)
+            print('\t'.join(table_details))
+            #print('')
+            table_details = []
+    return table_list
+
+def get_db_list(server_url):
+    """Returns list of databases
+    """
+    if not server_url.endswith('/'):
+        server_url += '/'
+
+    get_db_list_url = server_url  #+ 'export.csv?db=' + server_dbname
+
+    f = urlopen(get_db_list_url)
+    result = f.read()
+    #log.debug('Got %r', result)
+    # TODO parse table....
+    table_list = dumb_handbase_parser_printer(result)
+    return table_list
+
 POST = 'POST'
 
 def put_url(url, data, headers=None, verb=POST):
@@ -205,7 +268,9 @@ Examples:
     print('Using server: %s' % server_url)
 
     if options.ls:
-        raise NotImplementedError('list support TODO')
+        database_list = get_db_list(server_url)
+        print('database_list %r' % database_list)
+        return 0
 
     filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
     print('filename: %r' % filename)
