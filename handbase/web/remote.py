@@ -190,7 +190,8 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     else:
         raise NotImplementedError('dbtype=%r' % dbtype)
 
-    print((put_db_url, dbname, dbcontent, dbtype))
+    #print((put_db_url, dbname, dbcontent, dbtype))
+    print((put_db_url, dbname, len(dbcontent), dbtype))
 
     bounder_mark = b'----------BOUNDARY_MARKER_GOES_HERE'
     body_list = []
@@ -213,7 +214,8 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     body = b'\r\n'.join(body_list)
     content_type = b'multipart/form-data; boundary=%s' % bounder_mark
 
-    headers = {'content-type': content_type, 'content-length': len('content-length')}
+    headers = {'content-type': content_type, 'content-length': len(body)}
+    log.debug('headers %r', headers)
     put_url(put_db_url, body, headers=headers, verb=POST)
 
 
@@ -298,9 +300,20 @@ Examples:
     else:  # download (default)
         returned_filename, filecontents = get_db(server_url, dbname, dbtype=dbtype)
         #print((filename, returned_filename, filecontents))  # TODO save to disk
-        f = open(filename, 'wb')  # user specified filename
-        f.write(filecontents)
-        f.close()
+        save_content = False
+        if dbtype == DBTYPE_CSV:
+            if filecontents.strip():
+                save_content = True
+        else:
+            if len(filecontents) > 30:
+                save_content = True
+
+        if save_content:
+            f = open(filename, 'wb')  # user specified filename
+            f.write(filecontents)
+            f.close()
+        else:
+            log.info('NOT saving, result empty/too-small %d bytes', len(filecontents))
 
     return 0
 
