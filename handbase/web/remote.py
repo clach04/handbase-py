@@ -6,6 +6,7 @@
 
 """
 
+import datetime
 import logging
 import os
 from optparse import OptionParser
@@ -107,10 +108,10 @@ def dumb_handbase_parser_printer(html):
             tmp = table_details.pop(0)
             table_details.append(tmp)
             if header_row:
-                table_details[1] = '\t\t' + table_details[1]
+                table_details[1] = '\t' + table_details[1]
                 del table_details[3]
             else:
-                # TODO formatting of date into ISO
+                table_details[0] = datetime.datetime.strptime(table_details[0], '%a %b %d %H:%M:%S %Z %Y').isoformat()  # formatting of date into ISO; 'Wed Jan 10 20:18:44 PST 2024'
                 table_details[2] = '\t' + table_details[2]
                 table_list.append(table_details[-1])
             #print(table_details)
