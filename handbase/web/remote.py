@@ -40,6 +40,9 @@ ch.setFormatter(formatter)
 log.addHandler(ch)
 
 
+def handbase_url_escape(in_str):
+    # does not use urlencode() or quote_plus()
+    return in_str.replace(' ', '_')
 
 DBTYPE_PDB = 'PDB'
 DBTYPE_CSV = 'CSV'
@@ -54,6 +57,7 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
         server_url += '/'
 
     server_dbname = dbname + PDB_EXTENSION
+    server_dbname = handbase_url_escape(server_dbname)  # TODO needed for upload too? - alternative idea scrape download link based on name (which may not match filename)
 
     if dbtype == DBTYPE_CSV:
         get_db_url = server_url + 'export.csv?db=' + server_dbname
