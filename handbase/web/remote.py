@@ -78,6 +78,25 @@ def dumb_html_table_string_extract(line):
     tmp_str = tmp_str[:tmp_str.find('<')]
     return tmp_str
 
+def locale_date_string2datetime(in_str):
+    # handle date strings like: 'Wed Jan 10 20:18:44 PST 2024'
+    try:
+        result = datetime.datetime.strptime(in_str, '%a %b %d %H:%M:%S %Z %Y')
+    except ValueError:
+        # lets assume the string is valid, lets assume we hit case #6.1
+        # in https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+        # > strptime() only accepts certain values for %Z:
+        # > 1. any value in time.tzname for your machine's locale
+        # > 2. the hard-coded values UTC and GMT
+
+        # so we're probably on Windows, linux handles this fine. We'll just ignore the TZ name
+        #tz_name = in_str.rsplit(' ', 2)[1]
+        date_list = in_str.rsplit(' ', 2)
+        del date_list[1]
+        new_str = ' '.join(date_list)
+        result = datetime.datetime.strptime(new_str, '%a %b %d %H:%M:%S %Y')
+    return result
+
 def dumb_handbase_parser_printer(html, print_to_stdout=True):
     """This is EXTREMELY fragile and dependent on how HanDBase 4.x under Androoud displays its index.html
     """
@@ -111,7 +130,7 @@ def dumb_handbase_parser_printer(html, print_to_stdout=True):
                 table_details[1] = '\t' + table_details[1]
                 del table_details[3]
             else:
-                table_details[0] = datetime.datetime.strptime(table_details[0], '%a %b %d %H:%M:%S %Z %Y').isoformat()  # formatting of date into ISO; 'Wed Jan 10 20:18:44 PST 2024'
+                table_details[0] = locale_date_string2datetime(table_details[0]).isoformat()  # formatting of date into ISO; 'Wed Jan 10 20:18:44 PST 2024'
                 table_details[2] = '\t' + table_details[2]
                 #table_list.append(table_details[-1])  # table name only
                 table_list.append(table_details)  # all details
