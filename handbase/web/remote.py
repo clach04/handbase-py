@@ -133,7 +133,7 @@ def get_db_list(server_url):
     f = urlopen(get_db_list_url)
     result = f.read()
     #log.debug('Got %r', result)
-    # TODO parse table....
+    result = result.decode('utf-8')
     table_list = dumb_handbase_parser_printer(result, print_to_stdout=False)
     return table_list
 
