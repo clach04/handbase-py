@@ -195,20 +195,20 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
         server_url += '/'
 
     post_dict = {
-        'MAX_FILE_SIZE': '3000000',
-        'appletname': dbname,
+        'MAX_FILE_SIZE': b'3000000',
+        'appletname': dbname.encode('cp1252'),
     }
 
     if dbtype == DBTYPE_CSV:
         put_db_url = server_url + 'csv_import.html'
-        post_dict['UpCSV'] = 'Add CSV Data'
+        post_dict['UpCSV'] = b'Add CSV Data'
         filename = dbname + CSV_EXTENSION
-        file_content_type = 'text/csv'
+        file_content_type = b'text/csv'
     elif dbtype == DBTYPE_PDB:
         put_db_url = server_url + 'applet_add.html'
-        post_dict['UpPDB'] = 'Add File'
+        post_dict['UpPDB'] = b'Add File'
         filename = dbname + PDB_EXTENSION
-        file_content_type = 'application/octet-stream'
+        file_content_type = b'application/octet-stream'
     else:
         raise NotImplementedError('dbtype=%r' % dbtype)
 
@@ -220,19 +220,19 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
     for key in post_dict:
         value = post_dict[key]
         body_list.append(b'--' + bounder_mark)
-        body_list.append(b'Content-Disposition: form-data; name="%s"' % key)
+        body_list.append(b'Content-Disposition: form-data; name="%s"' % key.encode('us-ascii'))
         body_list.append(b'')
         body_list.append(value)
     # file
     files = [('localfile', filename, dbcontent), ]
     for (key, filename, value) in files:
         body_list.append(b'--' + bounder_mark)
-        body_list.append(b'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
+        body_list.append(b'Content-Disposition: form-data; name="%s"; filename="%s"' % (key.encode('us-ascii'), filename.encode('utf-8')))
         body_list.append(b'Content-Type: %s' % file_content_type)
         body_list.append(b'')
         body_list.append(value)
-    body_list.append('--' + bounder_mark + '--')
-    body_list.append('')
+    body_list.append(b'--' + bounder_mark + b'--')
+    body_list.append(b'')
     body = b'\r\n'.join(body_list)
     content_type = b'multipart/form-data; boundary=%s' % bounder_mark
 
