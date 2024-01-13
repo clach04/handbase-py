@@ -255,7 +255,7 @@ Examples:
     parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
 
     (options, args) = parser.parse_args(argv[1:])
-    if not args:
+    if not options.ls and not args:
         ## TODO consider using something line https://stackoverflow.com/a/664614 to add positional argument support
         parser.print_help()
         print('\n MISSING filename')  # stderr?
