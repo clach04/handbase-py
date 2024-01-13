@@ -125,6 +125,19 @@ Similar to Text but no control over max length. Supports 2000 bytes.
 
 Indicates Column/Field is not used (other than a visual seperate on screen) BUT will show up in CSV export as empty value.
 
+## Demo
+
+
+1. Download https://www.ddhsoftware.com/gallery.html?show=number&record=1727 Geek_Stuff by E. Cagle
+    ASCII character table in HanDBase version 3 format (limited to 7-bit values)
+
+        # upload database, NOTE if already there will DUPLICATE records/rows!
+        py  -3 handbase\web\remote.py -u geek_stuff.pdb
+        py  -3 handbase\web\remote.py -l
+        # see name is different from filename, note double quotes to escape filename spaces
+        py  -3 handbase\web\remote.py "Geek Stuff.csv"
+
+
 ## Web Access
 
 ### Listing databases
