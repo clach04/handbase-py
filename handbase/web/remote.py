@@ -68,7 +68,7 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     f = urlopen(get_db_url)
     result = f.read()
     #print('result: %r' % result)
-    log.debug('Got %r', result)
+    #log.debug('Got %r', result)  ## verbose debug
     return (result_filename, result)
 
 
