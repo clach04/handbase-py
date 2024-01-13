@@ -59,7 +59,7 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         print('*'*65)
         if ddl_sql is None:
             # Assume SQLite3 syntax
-            column_ddl = ', '.join(['%s STRING' % column_name for column_name in header])
+            column_ddl = ', '.join(['"%s" STRING' % column_name for column_name in header])
             print(column_ddl)
             ddl_sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, column_ddl)  # if table exists, assume correct column names (and we ignore types...)
         print(ddl_sql)
