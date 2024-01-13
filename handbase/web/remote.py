@@ -218,14 +218,8 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
 
 
 class MyOptionParser(OptionParser):
-    pass
-    """
     def format_epilog(self, formatter):
-        log.debug('formatter %r', formatter)
-        log.debug('epilog %r', self.epilog)
-        #return self.expand_prog_name(self.epilog)
-        return self.epilog
-    """
+        return self.expand_prog_name(self.epilog)
 
 def filename2dbname(filename):
     dbname = filename.replace('\\', '/')
@@ -239,8 +233,8 @@ def main(argv=None):
         argv = sys.argv
 
     usage = "usage: %prog [options] filename"
-    description = '''Interact with HanDBase web server
-
+    description = '''Interact with HanDBase web server'''
+    example_usage = '''
 Examples:
 
     %prog -u mydb.pdb  # upload HandDBase db, from file mydb.pdb
@@ -251,7 +245,7 @@ Examples:
     %prog  mydb.csv  # download csv, into file mydb.csv - defaults database name to mydb
     %prog  mydb.csv -d my_db_name  # download csv, into file mydb.csv - from specified database name
 '''
-    parser = MyOptionParser(usage=usage, version="%%prog %s" % __version__, description=description)
+    parser = MyOptionParser(usage=usage, version="%%prog %s" % __version__, description=description, epilog=example_usage)
     parser.add_option("-d", "--dbname", help="Database/table name, if not set defaults based on filename")
     parser.add_option("-l", "--ls", "--list", help="List databases TODO", action="store_true")
     parser.add_option("-u", "--upload", help="Upload a file", action="store_true")
@@ -259,6 +253,12 @@ Examples:
     parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
 
     (options, args) = parser.parse_args(argv[1:])
+    if not args:
+        ## TODO consider using something line https://stackoverflow.com/a/664614 to add positional argument support
+        parser.print_help()
+        print('\n MISSING filename')  # stderr?
+        return 1
+
     verbose = options.verbose
     if verbose:
         print('Python %s on %s' % (sys.version.replace('\n', ' - '), sys.platform))
