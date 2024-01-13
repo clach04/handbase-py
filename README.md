@@ -125,6 +125,21 @@ Similar to Text but no control over max length. Supports 2000 bytes.
 
 Indicates Column/Field is not used (other than a visual seperate on screen) BUT will show up in CSV export as empty value.
 
+## Web Access
+
+### Listing databases
+
+    py  -3 handbase\web\remote.py --ls
+
+### Downloading databases/csv
+
+    py  -3 handbase\web\remote.py DBNAME.csv
+    py  -3 handbase\web\remote.py DBNAME.pdb
+
+### Uploading databases/csv
+
+    py  -3 handbase\web\remote.py -u demo.csv
+
 ## CSV
 
 Double quotes are NOT required unless data needs to be escaped. Data that needs escaping:
