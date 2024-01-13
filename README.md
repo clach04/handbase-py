@@ -137,6 +137,17 @@ Indicates Column/Field is not used (other than a visual seperate on screen) BUT 
         # see name is different from filename, note double quotes to escape filename spaces
         py  -3 handbase\web\remote.py "Geek Stuff.csv"
 
+2. Download https://www.ddhsoftware.com/gallery.html?show=number&record=802 Wines of Spain by Francis Torres IllescasL
+    contains non-ascii characters
+
+    # upload database, NOTE if already there will DUPLICATE records/rows!
+    py  -3 handbase\web\remote.py -u vinos3.pdb
+    # list databases
+    py  -3 handbase\web\remote.py -l
+    # download CSV
+    py  -3 handbase\web\remote.py vinos3.csv
+    # convert into SQLite3 database, with correct encoding (utf-8)
+    py -3 handbase\csv\csv2db.py  vinos3.csv vinos3.sqlite3 vinos3
 
 ## Web Access
 
