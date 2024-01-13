@@ -78,7 +78,7 @@ def dumb_html_table_string_extract(line):
     tmp_str = tmp_str[:tmp_str.find('<')]
     return tmp_str
 
-def dumb_handbase_parser_printer(html):
+def dumb_handbase_parser_printer(html, print_to_stdout=True):
     """This is EXTREMELY fragile and dependent on how HanDBase 4.x under Androoud displays its index.html
     """
     handbase_table_start_marker = '<table'
@@ -113,9 +113,11 @@ def dumb_handbase_parser_printer(html):
             else:
                 table_details[0] = datetime.datetime.strptime(table_details[0], '%a %b %d %H:%M:%S %Z %Y').isoformat()  # formatting of date into ISO; 'Wed Jan 10 20:18:44 PST 2024'
                 table_details[2] = '\t' + table_details[2]
-                table_list.append(table_details[-1])
+                #table_list.append(table_details[-1])  # table name only
+                table_list.append(table_details)  # all details
             #print(table_details)
-            print('\t'.join(table_details))
+            if print_to_stdout:
+                print('\t'.join(table_details))
             #print('')
             table_details = []
     return table_list
@@ -132,7 +134,7 @@ def get_db_list(server_url):
     result = f.read()
     #log.debug('Got %r', result)
     # TODO parse table....
-    table_list = dumb_handbase_parser_printer(result)
+    table_list = dumb_handbase_parser_printer(result, print_to_stdout=False)
     return table_list
 
 POST = 'POST'
@@ -278,7 +280,10 @@ Examples:
 
     if options.ls:
         database_list = get_db_list(server_url)
-        print('database_list %r' % database_list)
+        database_list.sort()
+        for row in database_list:
+            print('\t'.join(row))
+        #print('database_list %r' % database_list)
         return 0
 
     filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
