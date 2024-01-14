@@ -247,6 +247,7 @@ def put_db(server_url, dbname, dbcontent, dbtype=DBTYPE_CSV):
 
 class MyOptionParser(OptionParser):
     def format_epilog(self, formatter):
+        # preserve newlines
         return self.expand_prog_name(self.epilog)
 
 def filename2dbname(filename):

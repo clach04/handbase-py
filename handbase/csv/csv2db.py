@@ -8,6 +8,7 @@
 
 import codecs  # pre Python 3 support
 import csv
+from optparse import OptionParser
 import os
 import sqlite3
 import sys
@@ -26,6 +27,9 @@ except ImportError:
 from db2csv import con2driver
 
 is_py3 = sys.version_info >= (3,)
+
+
+__version__ = '0.0.0'
 
 
 def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=None, ddl_sql=None, dml_sql=None, encoding='cp1252'):
@@ -91,14 +95,57 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         fh.close()
 
 
+class MyOptionParser(OptionParser):  # FIXME dupe
+    def format_epilog(self, formatter):
+        # preserve newlines
+        return self.expand_prog_name(self.epilog)
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    csv_filename = argv[1]
-    connection_string = argv[2]
-    table_name = argv[3]
-    dump_csv_to_db(csv_filename, connection_string, table_name)
+    usage = "usage: %prog [options] filename.csv"
+    description = '''CSV2SQLite3'''
+    example_usage = '''
+Examples:
+
+    %prog TODO
+'''
+    parser = MyOptionParser(usage=usage, version="%%prog %s" % __version__, description=description, epilog=example_usage)
+    parser.add_option("-d", "--dbname", help="Database name, if not set defaults based on filename")
+    parser.add_option("-t", "--table", help="Table name, if not set defaults based on filename")
+    parser.add_option("-e", "--encoding", help="Character encoding. WARNING HanDBase (v4) ONLY supports cp1252, NOT utf-8, only set if you know what you are doing", default='cp1252')
+    parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
+
+    (options, args) = parser.parse_args(argv[1:])
+    if not args:
+        ## TODO consider using something line https://stackoverflow.com/a/664614 to add positional argument support
+        parser.print_help()
+        print('\n MISSING CSV filename')  # stderr?
+        return 1
+
+    verbose = options.verbose
+    if verbose:
+        print('Python %s on %s' % (sys.version.replace('\n', ' - '), sys.platform))
+
+    print('options: %r' % options)
+    print('args: %r' % args)
+    print('dbname: %r' % options.dbname)
+    print('encoding: %r' % options.encoding)
+
+    csv_filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
+    print('filename: %r' % csv_filename)
+
+    if not options.table:
+        options.table = 'default_table'  # FIXME
+
+    if not options.dbname:
+        options.dbname = csv_filename + '.sqlite3'  # TODO remove CSV....
+
+    table_name = options.table
+    connection_string = options.dbname
+    dump_csv_to_db(csv_filename, connection_string, table_name, encoding=options.encoding)
 
     return 0
 
