@@ -320,6 +320,10 @@ Examples:
     dbtype = DBTYPE_CSV
     if filename.lower().endswith('.pdb'):
         dbtype = DBTYPE_PDB
+        """If ends in PDB then we get a database, else CSV.
+        Just the database name alone (with no extension) works, and downlods CSV
+        NOTE but file will be missing CSV extension when saved.
+        """
 
     #raise Shields
     if options.upload:
