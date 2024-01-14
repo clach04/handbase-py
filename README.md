@@ -147,7 +147,7 @@ Indicates Column/Field is not used (other than a visual seperate on screen) BUT 
     # download CSV
     py  -3 handbase\web\remote.py vinos3.csv
     # convert into SQLite3 database, with correct encoding (utf-8)
-    py -3 handbase\csv\csv2db.py  vinos3.csv vinos3.sqlite3 vinos3
+    py -3 handbase\csv\csv2db.py  vinos3.csv -d vinos3.sqlite3 -t vinos3
     # convert back into CSV
     py -3 handbase\csv\db2csv.py vinos3.sqlite3 vinos3 >test.csv  # FIXME Windows issues, make output a filename parameter
 
@@ -203,10 +203,10 @@ NOTE incomplete! Does not handle:
 
 Assuming demo above has been ran already and have a file called `demo.csv`:
 
-    python handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
-    python2 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
-    python3 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
-    py -3 handbase/csv/csv2db.py demo.csv test_delme.sqlite3 quotes
+    python handbase/csv/csv2db.py demo.csv -d test_delme.sqlite3 -t quotes
+    python2 handbase/csv/csv2db.py demo.csv -d test_delme.sqlite3 -t quotes
+    python3 handbase/csv/csv2db.py demo.csv -d test_delme.sqlite3 -t quotes
+    py -3 handbase/csv/csv2db.py demo.csv -d test_delme.sqlite3 -t quotes
     sqlite3 test_delme.sqlite3 .dump
 
 ## HanDBase PDB
