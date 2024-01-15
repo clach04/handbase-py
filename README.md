@@ -116,7 +116,7 @@ Similar to Date BUT without Current option
 
 Values in CSV of `No Time` indicate NULL/missing.
 
-Database does appear to store seconds. CSV does NOT export seconds.
+Database does appear to store seconds. CSV does NOT export seconds. this maybe a bug? https://www.ddhsoftware.com/forum/viewtopic.php?p=11228#p11229
 
 Format appears to be AM/PM based, viz. "HH:MM Xm" and whilst the form appear to support/honor seconds CSV export does not. Examples `12:34 pm` and surprisingly `03:50 pm` (i.e., 2 digits for hour, and PM/AM is required) do not confused with 24 Hour format.
 UNTESTED sending in 24 hour strings for Handbase to import.
