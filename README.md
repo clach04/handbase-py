@@ -132,39 +132,39 @@ Indicates Column/Field is not used (other than a visual seperate on screen) BUT 
     ASCII character table in HanDBase version 3 format (limited to 7-bit values)
 
         # upload database, NOTE if already there will DUPLICATE records/rows!
-        py  -3 handbase\web\remote.py -u geek_stuff.pdb
-        py  -3 handbase\web\remote.py -l
+        py  -3 handbase/web/remote.py -u geek_stuff.pdb
+        py  -3 handbase/web/remote.py -l
         # see name is different from filename, note double quotes to escape filename spaces
-        py  -3 handbase\web\remote.py "Geek Stuff.csv"
+        py  -3 handbase/web/remote.py "Geek Stuff.csv"
 
 2. Download https://www.ddhsoftware.com/gallery.html?show=number&record=802 Wines of Spain by Francis Torres IllescasL
     contains non-ascii characters
 
     # upload database, NOTE if already there will DUPLICATE records/rows!
-    py  -3 handbase\web\remote.py -u vinos3.pdb
+    py  -3 handbase/web/remote.py -u vinos3.pdb
     # list databases
-    py  -3 handbase\web\remote.py -l
+    py  -3 handbase/web/remote.py -l
     # download CSV
-    py  -3 handbase\web\remote.py vinos3.csv
+    py  -3 handbase/web/remote.py vinos3.csv
     # convert into SQLite3 database, with correct encoding (utf-8)
-    py -3 handbase\csv\csv2db.py  vinos3.csv -d vinos3.sqlite3 -t vinos3
+    py -3 handbase/csv/csv2db.py  vinos3.csv -d vinos3.sqlite3 -t vinos3
     # convert back into CSV
-    py -3 handbase\csv\db2csv.py vinos3.sqlite3 vinos3 >test.csv  # FIXME Windows issues, make output a filename parameter
+    py -3 handbase/csv/db2csv.py vinos3.sqlite3 vinos3 >test.csv  # FIXME Windows issues, make output a filename parameter
 
 ## Web Access
 
 ### Listing databases
 
-    py  -3 handbase\web\remote.py --ls
+    py  -3 handbase/web/remote.py --ls
 
 ### Downloading databases/csv
 
-    py  -3 handbase\web\remote.py DBNAME.csv
-    py  -3 handbase\web\remote.py DBNAME.pdb
+    py  -3 handbase/web/remote.py DBNAME.csv
+    py  -3 handbase/web/remote.py DBNAME.pdb
 
 ### Uploading databases/csv
 
-    py  -3 handbase\web\remote.py -u demo.csv
+    py  -3 handbase/web/remote.py -u demo.csv
 
 ## CSV
 
@@ -227,7 +227,7 @@ Assuming demo above has been ran already and have a file called `demo.csv`:
       * `HanDHanD` at offset 0x3c (60)
       * `HanDB` variable location, around offset 0x3c0 - 0x3d0
           * after this section field/column metadata present
-  * there are 20 instances of a byte sequence which looks like an extract of the 7-bit US-ASCII table, but it is truncated, " !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abc"
+  * there are 20 instances of a byte sequence which looks like an extract of the 7-bit US-ASCII table, but it is truncated, " !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[/]^_`abc"
       * Some **maybe** related to Views/Forms?
   * `pdblb` shows up a few times as some sort of seperator, **probably NOT** related to number of fields/columns in one table with 16-17 columns saw occurence count=11. For 2 column table (2 rows) saw 4 times.
       * Seen within a few bytes of pop-up values list values
