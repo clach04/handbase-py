@@ -49,7 +49,7 @@ For missing/empty, empty string is used.
 Range appears to be:
 
   * -1410065407 (-1,410,065,407)
-  *  1215752191 (1,215,752,191) == 0x4876E7FF
+  *  1215752191 (1,215,752,191) == 0x4876E7FF == 0b1001000011101101110011111111111
 
 Can't figure this out
 
