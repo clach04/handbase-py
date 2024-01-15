@@ -130,6 +130,16 @@ Similar to Text but no control over max length. Supports 2000 bytes.
 
 Indicates Column/Field is not used (other than a visual seperate on screen) BUT will show up in CSV export as empty value.
 
+#### Calculated
+
+Can only generate results of types:
+
+  * number (float and pseudo integer)
+  * date-only
+  * time-only
+
+can perform, for example string concatenation nor extraction. TODO see masks?
+
 ## Demo
 
 
