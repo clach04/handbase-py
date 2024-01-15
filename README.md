@@ -34,7 +34,8 @@ Table of Contents
 
 ### Limits
 
-  * Maximum number of fields 100
+  * Maximum number of fields 100 (version 4.x)
+      * looks like version 1.x was limited to 39 fields https://the-gadgeteer.com/1999/01/14/palm_os_database_comparison_review/#HanDbase
 
 ### Datatypes
 
