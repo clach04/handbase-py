@@ -91,6 +91,11 @@ Whilst field/column is included in CSV always empty.
 
 #### Date
 
+Range:
+  * 1904-01-02
+  * 2031-12-31
+also see https://www.ddhsoftware.com/forum/viewtopic.php?f=19&t=4417#p18874
+
 Where values can be manually or automatically set:
 
   * Date Ask / Manually entered
