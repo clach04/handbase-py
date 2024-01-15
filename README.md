@@ -140,6 +140,10 @@ Can only generate results of types:
 
 can perform, for example string concatenation nor extraction. TODO see masks?
 
+https://www.ddhsoftware.com/forum/viewtopic.php?f=6&t=4375#p18739
+
+time is number of seconds for the day for math.
+
 ## Demo
 
 
