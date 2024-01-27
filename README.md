@@ -200,6 +200,15 @@ Checkbox False values are exported as `0` and True values are exported as `1`.
 
 Python csv module `writerow()` works fine with Handbase without any extra flags.
 
+### Existing CSV/SQLite Tools
+
+  * https://github.com/wireservice/csvkit
+  * https://github.com/saulpw/visidata
+    * https://github.com/jsvine/visidata-cheat-sheet
+  * https://github.com/thombashi/sqlitebiter A CLI tool to convert CSV / Excel / HTML / JSON / Jupyter Notebook / LDJSON / LTSV / Markdown / SQLite / SSV / TSV / Google-Sheets to a SQLite database file.
+  * https://github.com/simonw/sqlite-utils
+  * https://github.com/simonw/datasette
+
 ### Generating CSV Files Suitable For Import Into Handbase For Android
 
 Demo SQLite3 database, exported in a format suitable for Handbase on Android to be imported via the web interface.
