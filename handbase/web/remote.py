@@ -305,6 +305,7 @@ Examples:
     if options.ls:
         database_list = get_db_list(server_url)
         database_list.sort()
+        print('\t'.join(['datetime', '', 'size', '    row-count', 'database-name', ]))
         for row in database_list:
             print('\t'.join(row))
         #print('database_list %r' % database_list)
