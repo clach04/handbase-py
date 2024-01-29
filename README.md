@@ -176,6 +176,8 @@ time is number of seconds for the day for math.
 ### Listing databases
 
     py  -3 handbase/web/remote.py --ls
+    py  -3 handbase/web/remote.py -l
+    py  -3 handbase/web/remote.py -l http://11.22.33.44:8000
 
 ### Downloading databases/csv
 
