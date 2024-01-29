@@ -75,6 +75,23 @@ def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     #log.debug('Got %r', result)  ## verbose debug
     return (result_filename, result)
 
+def download_and_save_to_disk(filename, server_url, dbname, dbtype=DBTYPE_CSV):
+    returned_filename, filecontents = get_db(server_url, dbname, dbtype=dbtype)
+    #print((filename, returned_filename, filecontents))  # TODO save to disk
+    save_content = False
+    if dbtype == DBTYPE_CSV:
+        if filecontents.strip():
+            save_content = True
+    else:
+        if len(filecontents) > 30:
+            save_content = True
+
+    if save_content:
+        f = open(filename, 'wb')  # user specified filename
+        f.write(filecontents)
+        f.close()
+    else:
+        log.info('NOT saving, result empty/too-small %d bytes', len(filecontents))
 
 def dumb_html_table_string_extract(line):
     # line needs to contain a single line, no newlines
@@ -279,10 +296,11 @@ Examples:
     parser.add_option("-l", "--ls", "--list", help="List databases TODO", action="store_true")
     parser.add_option("-u", "--upload", help="Upload a file", action="store_true")
     parser.add_option("--url", help="Specify server URL, if not set checks HANDBASE_URL os env, defaults to http://localhost:8000")
+    parser.add_option("--downloadall", help="download all in format csv or pdb")  # TODO restrict options here? CSV_EXTENSION or PDB_EXTENSION
     parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
 
     (options, args) = parser.parse_args(argv[1:])
-    if not options.ls and not args:
+    if not (options.ls or options.downloadall) and not args:
         ## TODO consider using something line https://stackoverflow.com/a/664614 to add positional argument support
         parser.print_help()
         print('\n MISSING filename')  # stderr?
@@ -310,6 +328,16 @@ Examples:
             print('\t'.join(row))
         #print('database_list %r' % database_list)
         return 0
+    elif options.downloadall:
+        dbtype = DBTYPE_CSV  # FIXME use downloadall
+        print('Download all in format %s' % options.downloadall)
+        database_list = get_db_list(server_url)
+        for row in database_list:
+            database = row[3]
+            filename = database + '.' + options.downloadall
+            print('Downloading %s ...' % database)
+            download_and_save_to_disk(filename, server_url, database, dbtype=dbtype)
+        return 0
 
     filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
     print('filename: %r' % filename)
@@ -333,22 +361,7 @@ Examples:
         f.close()
         put_db(server_url, dbname, csv_bytes, dbtype=dbtype)
     else:  # download (default)
-        returned_filename, filecontents = get_db(server_url, dbname, dbtype=dbtype)
-        #print((filename, returned_filename, filecontents))  # TODO save to disk
-        save_content = False
-        if dbtype == DBTYPE_CSV:
-            if filecontents.strip():
-                save_content = True
-        else:
-            if len(filecontents) > 30:
-                save_content = True
-
-        if save_content:
-            f = open(filename, 'wb')  # user specified filename
-            f.write(filecontents)
-            f.close()
-        else:
-            log.info('NOT saving, result empty/too-small %d bytes', len(filecontents))
+        download_and_save_to_disk(filename, server_url, dbname, dbtype=dbtype)
 
     return 0
 
