@@ -2,7 +2,7 @@
 # -*- coding: us-ascii -*-
 # vim:ts=4:sw=4:softtabstop=4:smarttab:expandtab
 #
-"""CSV sqlite3 or ODBC to that's suitable for Handbase (for Android) CSV fies.
+"""CSV to sqlite3 or ODBC to that's suitable for Handbase (for Android) CSV fies.
 
 """
 
@@ -23,7 +23,7 @@ except ImportError:
     except ImportError:
         pyodbc = None
 
-
+import handbase_format
 from db2csv import con2driver
 
 is_py3 = sys.version_info >= (3,)
@@ -113,7 +113,8 @@ Examples:
     %prog TODO
 '''
     parser = MyOptionParser(usage=usage, version="%%prog %s" % __version__, description=description, epilog=example_usage)
-    parser.add_option("-d", "--dbname", help="Database name, if not set defaults based on filename")
+    parser.add_option("-d", "--dbname", help="SQL (SQLite3) Database name, if not set defaults based on filename.csv")
+    parser.add_option("--pdb", help="Optional HanDBase filename, used to generate DDL (data ignored, data comes from CSV)")
     parser.add_option("-t", "--table", help="Table name, if not set defaults based on filename")
     parser.add_option("-e", "--encoding", help="Character encoding. WARNING HanDBase (v4) ONLY supports cp1252, NOT utf-8, only set if you know what you are doing", default='cp1252')
     parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
@@ -145,7 +146,21 @@ Examples:
 
     table_name = options.table
     connection_string = options.dbname
-    dump_csv_to_db(csv_filename, connection_string, table_name, encoding=options.encoding)
+
+    if options.pdb:
+        if table_name:
+            table_name_override = table_name
+        else:
+            table_name_override = None
+        f = open(options.pdb, 'rb')
+        data = f.read()
+        f.close()
+        metadata = handbase_format.extract_metadata(data, include_unused=False, include_heading=True)  # they show up in CSV!?
+        ddl_sql = handbase_format.meta2sql_ddl(metadata, table_name=table_name_override)
+    else:
+        ddl_sql = None
+
+    dump_csv_to_db(csv_filename, connection_string, table_name, ddl_sql=ddl_sql, encoding=options.encoding)
 
     return 0
 
