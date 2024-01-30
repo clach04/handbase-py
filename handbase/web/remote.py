@@ -48,6 +48,10 @@ DBTYPE_PDB = 'PDB'
 DBTYPE_CSV = 'CSV'
 PDB_EXTENSION = '.PDB'  # case significant, for url?
 CSV_EXTENSION = '.csv'
+dbtype2file_extn = {
+    DBTYPE_PDB: PDB_EXTENSION,
+    DBTYPE_CSV: CSV_EXTENSION,
+}
 
 def get_db(server_url, dbname, dbtype=DBTYPE_CSV):
     """Returns tuple of; filename, contents.
@@ -95,6 +99,21 @@ def download_and_save_to_disk(filename, server_url, dbname, dbtype=DBTYPE_CSV):
 
 def dumb_html_table_string_extract(line):
     # line needs to contain a single line, no newlines
+
+    # filename
+    # Extract/handle: <td class="dlip"><a href="test.PDB" class="hb"><img src="dlpdb.gif" title="Download Database File to Desktop" border=0></a>
+    if '"This database does not permit full access to sharing' in line:
+        return '!NOT_SHARED!'
+    elif line.startswith('<td class="dlip"><a href="'):
+        search_term = '<a href="'
+        tmp_str = line[line.find(search_term) + len(search_term):]
+        tmp_str = tmp_str[:tmp_str.find('"')]
+        # remove filename extension
+        if tmp_str.upper().endswith(PDB_EXTENSION):
+            tmp_str = tmp_str[:-len(PDB_EXTENSION)]
+        return tmp_str
+
+    # Extract/handle <anytag>VALUE</anytag>
     tmp_str = line[line.find('>') + 1:]
     tmp_str = tmp_str[:tmp_str.find('<')]
     return tmp_str
@@ -119,7 +138,12 @@ def locale_date_string2datetime(in_str):
     return result
 
 def dumb_handbase_parser_printer(html, print_to_stdout=True):
-    """This is EXTREMELY fragile and dependent on how HanDBase 4.x under Androoud displays its index.html
+    """This is EXTREMELY fragile and dependent on how HanDBase 4.x under Android displays its index.html
+    FIXME database name is NOT the filename :-(
+
+    Handle:
+        <td class="dlip"><a href="time_billing_detail.PDB" class="hb"><img src="dlpdb.gif" title="Download Database File to Desktop" border=0></a>
+        <a href="export.csv?db=time_billing_detail.PDB" class="hb"><img src="dlcsv.gif" title="Download data as a CSV (Comma Separated Values) file for use with other programs" border=0></a>
     """
     handbase_table_start_marker = '<table'
     handbase_table_end_marker = '</table>'
@@ -134,9 +158,10 @@ def dumb_handbase_parser_printer(html, print_to_stdout=True):
     table_details = []
     table_list = []
     for line in table_str.split('\n'):
+        #print('DEBUG html line: %r' % line)
         #if ' class="thbody">' in line:
         #if ' class="tdbody">' in line:
-        if ' class="tdbody">' in line or ' class="thbody">' in line:
+        if ' class="tdbody">' in line or ' class="thbody">' in line or '<td class="dlip">' in line:
             #print('%s' % line)
             #print('%s' % dumb_html_table_string_extract(line))
             table_details.append(dumb_html_table_string_extract(line))
@@ -145,14 +170,14 @@ def dumb_handbase_parser_printer(html, print_to_stdout=True):
             if table_details == ['Database', 'Date/Time', 'File Size', 'Records', 'Download']:
                 header_row = True
             #print(table_details)
-            tmp = table_details.pop(0)
-            table_details.append(tmp)
+            tmp_database_name = table_details.pop(0)  # database name
+            table_details.append(tmp_database_name)
             if header_row:
                 table_details[1] = '\t' + table_details[1]
                 del table_details[3]
             else:
                 table_details[0] = locale_date_string2datetime(table_details[0]).isoformat()  # formatting of date into ISO; 'Wed Jan 10 20:18:44 PST 2024'
-                table_details[2] = '\t' + table_details[2]
+                table_details[2] = int(table_details[2])
                 #table_list.append(table_details[-1])  # table name only
                 table_list.append(table_details)  # all details
             #print(table_details)
@@ -296,10 +321,21 @@ Examples:
     parser.add_option("-l", "--ls", "--list", help="List databases TODO", action="store_true")
     parser.add_option("-u", "--upload", help="Upload a file", action="store_true")
     parser.add_option("--url", help="Specify server URL, if not set checks HANDBASE_URL os env, defaults to http://localhost:8000")
-    parser.add_option("--downloadall", help="download all in format csv or pdb")  # TODO restrict options here? CSV_EXTENSION or PDB_EXTENSION
+    parser.add_option("--downloadall", help="download all in format [csv|pdb|all]")  # TODO restrict options here? CSV_EXTENSION or PDB_EXTENSION
     parser.add_option("-v", "--verbose", help='Verbose', action="store_true")
 
     (options, args) = parser.parse_args(argv[1:])
+    if options.downloadall:
+        downloadall = options.downloadall.upper()
+        if downloadall not in (DBTYPE_PDB, DBTYPE_CSV, 'ALL'):
+            parser.print_help()
+            print('\n Unrecognized downloadall')  # stderr?
+            return 1
+        if downloadall == 'ALL':
+            downloadall = (DBTYPE_PDB, DBTYPE_CSV)
+        else:
+            downloadall = (downloadall,)
+
     if not (options.ls or options.downloadall) and not args:
         ## TODO consider using something line https://stackoverflow.com/a/664614 to add positional argument support
         parser.print_help()
@@ -323,20 +359,24 @@ Examples:
     if options.ls:
         database_list = get_db_list(server_url)
         database_list.sort()
-        print('\t'.join(['datetime', '', 'size', '    row-count', 'database-name', ]))
+        print('\t'.join(['datetime', '', 'size', 'row-count', 'filename_no_extension', '', '    database-name', ]))
         for row in database_list:
-            print('\t'.join(row))
+            #print('\t'.join(row))
+            #print(row)
+            print('%s  %7s %6d %30s %30s' % tuple(row))
         #print('database_list %r' % database_list)
         return 0
     elif options.downloadall:
-        dbtype = DBTYPE_CSV  # FIXME use downloadall
-        print('Download all in format %s' % options.downloadall)
-        database_list = get_db_list(server_url)
-        for row in database_list:
-            database = row[3]
-            filename = database + '.' + options.downloadall
-            print('Downloading %s ...' % database)
-            download_and_save_to_disk(filename, server_url, database, dbtype=dbtype)
+        for dbtype in downloadall:
+            print('Download all in format %s' % options.downloadall)
+            database_list = get_db_list(server_url)
+            for row in database_list:
+                database = row[3]
+                if database == '!NOT_SHARED!':  # FIXME use a constant, not a literal
+                    continue  # skip as this database/file is not shared
+                filename = database + dbtype2file_extn[dbtype]
+                print('Downloading %s ...' % database)
+                download_and_save_to_disk(filename, server_url, database, dbtype=dbtype)
         return 0
 
     filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
@@ -347,10 +387,10 @@ Examples:
     print('dbname: %r' % dbname)
 
     dbtype = DBTYPE_CSV
-    if filename.lower().endswith('.pdb'):
+    if filename.upper().endswith(PDB_EXTENSION):
         dbtype = DBTYPE_PDB
         """If ends in PDB then we get a database, else CSV.
-        Just the database name alone (with no extension) works, and downlods CSV
+        Just the database name alone (with no extension) works, and downloads CSV
         NOTE but file will be missing CSV extension when saved.
         """
 
