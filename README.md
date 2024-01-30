@@ -205,6 +205,7 @@ Python csv module `writerow()` works fine with Handbase without any extra flags.
 ### Existing CSV/SQLite Tools
 
   * https://github.com/wireservice/csvkit
+  * https://github.com/catherinedevlin/ddl-generator
   * https://github.com/saulpw/visidata
     * https://github.com/jsvine/visidata-cheat-sheet
   * https://github.com/thombashi/sqlitebiter A CLI tool to convert CSV / Excel / HTML / JSON / Jupyter Notebook / LDJSON / LTSV / Markdown / SQLite / SSV / TSV / Google-Sheets to a SQLite database file.
