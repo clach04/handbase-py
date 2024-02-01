@@ -72,7 +72,7 @@ Float-4 Ranges seen:
 
 #### Pop-Up
 
-When not set, `No Value` - unclear how a string value of same text would work, presumbly treated as NULL/Empty.
+In CSV, when not set (i.e. NULL/Empty), `No Value` - unclear how a string value of same text would work, presumbly treated as NULL/Empty.
 Looks like Pop-Up maybe relaetd to DB Pop-UP but this maybe two types? one a lookup the other string where appends/concatenates?
 Unclear how Linked Parent/Child work
 
@@ -92,6 +92,8 @@ Whilst field/column is included in CSV always empty.
 
 #### Date
 
+In CSV, when not set (i.e. NULL/Empty), `No Date`
+
 Range:
   * 1904-01-02
   * 2031-12-31
@@ -108,6 +110,8 @@ Values in CSV of `No Date` indicate NULL/missing.
 Format appears to be US format, viz. MM-DD-YYYY example `01/07/2024`.
 
 #### Time
+
+In CSV, when not set (i.e. NULL/Empty), `No Time`
 
 Similar to Date BUT without Current option
 

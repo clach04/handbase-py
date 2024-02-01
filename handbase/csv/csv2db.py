@@ -37,7 +37,7 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
     Assumes string type for all columns.
     Creates table if not present.
     Appends to table.
-    DOES NOT handle NULL values
+    Partially handles NULL values, does NOT check datatype.
     Does NOT do any datatype checking. Ideas:
         * scan data keeping stats, then INSERT using best guess heuristic
         * pass in some sort of schema/mapping details
@@ -86,7 +86,13 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
             if row[0].startswith('Power drift'):
                 import pdb ; pdb.set_trace()
             """
-            cur.execute(dml_sql, row)
+            processed_row = []
+            for column in row:
+                if column in ('No Date', 'No Time', 'No Value'):
+                    # we assume this is a date column TODO check metadata...
+                    column = None
+                processed_row.append(column)
+            cur.execute(dml_sql, tuple(processed_row))
         cur.close()
         con.commit()
         con.close()
@@ -138,11 +144,9 @@ Examples:
     csv_filename = args[0]  # looks like case may is NOT be significant to server (for download or upload)
     print('filename: %r' % csv_filename)
 
-    if not options.table:
-        options.table = 'default_table'  # FIXME
-
     if not options.dbname:
         options.dbname = csv_filename + '.sqlite3'  # TODO remove CSV....
+    print('dbname: %r' % options.dbname)
 
     table_name = options.table
     connection_string = options.dbname
@@ -157,8 +161,14 @@ Examples:
         f.close()
         metadata = handbase_format.extract_metadata(data, include_unused=False, include_heading=True)  # they show up in CSV!?
         ddl_sql = handbase_format.meta2sql_ddl(metadata, table_name=table_name_override)
+        if table_name is None:
+            table_name = metadata['table_name']
     else:
         ddl_sql = None
+
+    if not table_name:
+        table_name = 'default_table'  # FIXME, use databasename?
+
 
     dump_csv_to_db(csv_filename, connection_string, table_name, ddl_sql=ddl_sql, encoding=options.encoding)
 
