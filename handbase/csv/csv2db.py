@@ -92,6 +92,7 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
                 if column in ('No Date', 'No Time', 'No Value'):
                     # we assume this is a date column TODO check metadata...
                     column = None
+                # FIXME handle dates, date format is US, really want iso/ansi format
                 processed_row.append(column)
             cur.execute(dml_sql, tuple(processed_row))
         cur.close()
