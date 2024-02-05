@@ -89,18 +89,21 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
             """
             processed_row = []
             for column_count, column in enumerate(row):
-                if column in ('No Date', 'No Time', 'No Value'):
-                    # we assume this is a date column TODO check metadata...
-                    column = None
-                # FIXME handle dates, date format is US (mm/dd/yyyy), really want iso/ansi format (yyyy-mm-dd)
-                if column and metadata:
-                    column_name, column_datatype, column_datatype_text, column_length = metadata['columns'][column_count]
-                    #sys.stdout.write('%r ' % (metadata['columns'][column_count], ))
-                    #sys.stdout.write('%r ' % ((column_name, column_datatype, column_datatype_text),))
-                    if handbase_format.HANDBASE_TYPE_DATE == column_datatype_text:
-                        #sys.stdout.write('%s ' % column)
-                        date_month, date_day, date_year = column.split('/')
-                        column = '%s-%s-%s' % (date_year, date_month, date_day, )
+                if column:
+                    if metadata:
+                        column_name, column_datatype, column_datatype_text, column_length = metadata['columns'][column_count]
+                        #sys.stdout.write('%r ' % (metadata['columns'][column_count], ))
+                        #sys.stdout.write('%r ' % ((column_name, column_datatype, column_datatype_text),))
+                        if handbase_format.HANDBASE_TYPE_DATE == column_datatype_text:
+                            if column = 'No Date':
+                                column = None
+                            else:
+                                #sys.stdout.write('%s ' % column)
+                                date_month, date_day, date_year = column.split('/')
+                                column = '%s-%s-%s' % (date_year, date_month, date_day, )
+                    elif column in ('No Date', 'No Time', 'No Value'):
+                        # no metadata so we assume this is a date/time column
+                        column = None
                 #sys.stdout.write('%d ' % column_count)
                 processed_row.append(column)
             cur.execute(dml_sql, tuple(processed_row))
