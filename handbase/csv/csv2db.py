@@ -78,7 +78,8 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
         cur = con.cursor()
         cur.execute(ddl_sql)
 
-        for row in in_csv:
+        for row_count, row in enumerate(in_csv):
+            print('row %d' % row_count)  # TODO verbose logging option
             if not is_py3:
                 row = [x.decode(encoding) for x in row]
             #print(repr(row))
