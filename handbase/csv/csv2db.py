@@ -32,7 +32,7 @@ is_py3 = sys.version_info >= (3,)
 __version__ = '0.0.0'
 
 
-def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=None, ddl_sql=None, dml_sql=None, encoding='cp1252'):
+def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?', db_driver=None, ddl_sql=None, dml_sql=None, encoding='cp1252', metadata=None):
     """Open's named CSV file and uses header as column names.
     Assumes string type for all columns.
     Creates table if not present.
@@ -88,11 +88,20 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
                 import pdb ; pdb.set_trace()
             """
             processed_row = []
-            for column in row:
+            for column_count, column in enumerate(row):
                 if column in ('No Date', 'No Time', 'No Value'):
                     # we assume this is a date column TODO check metadata...
                     column = None
-                # FIXME handle dates, date format is US, really want iso/ansi format
+                # FIXME handle dates, date format is US (mm/dd/yyyy), really want iso/ansi format (yyyy-mm-dd)
+                if column and metadata:
+                    column_name, column_datatype, column_datatype_text, column_length = metadata['columns'][column_count]
+                    #sys.stdout.write('%r ' % (metadata['columns'][column_count], ))
+                    #sys.stdout.write('%r ' % ((column_name, column_datatype, column_datatype_text),))
+                    if handbase_format.HANDBASE_TYPE_DATE == column_datatype_text:
+                        #sys.stdout.write('%s ' % column)
+                        date_month, date_day, date_year = column.split('/')
+                        column = '%s-%s-%s' % (date_year, date_month, date_day, )
+                #sys.stdout.write('%d ' % column_count)
                 processed_row.append(column)
             cur.execute(dml_sql, tuple(processed_row))
         cur.close()
@@ -171,7 +180,7 @@ Examples:
     if not table_name:
         table_name = 'default_table'  # FIXME, use databasename?
 
-    dump_csv_to_db(csv_filename, connection_string, table_name, ddl_sql=ddl_sql, encoding=options.encoding)
+    dump_csv_to_db(csv_filename, connection_string, table_name, ddl_sql=ddl_sql, encoding=options.encoding, metadata=metadata)
 
     return 0
 
