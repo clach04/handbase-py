@@ -94,13 +94,18 @@ def dump_csv_to_db(csv_filename, connection_string, table_name, param_marker='?'
                         column_name, column_datatype, column_datatype_text, column_length = metadata['columns'][column_count]
                         #sys.stdout.write('%r ' % (metadata['columns'][column_count], ))
                         #sys.stdout.write('%r ' % ((column_name, column_datatype, column_datatype_text),))
-                        if handbase_format.HANDBASE_TYPE_DATE == column_datatype_text:
+                        if handbase_format.HANDBASE_TYPE_TIME == column_datatype_text:
+                            if column = 'No Time':
+                                column = None
+                        elif handbase_format.HANDBASE_TYPE_DATE == column_datatype_text:
                             if column = 'No Date':
                                 column = None
                             else:
                                 #sys.stdout.write('%s ' % column)
                                 date_month, date_day, date_year = column.split('/')
                                 column = '%s-%s-%s' % (date_year, date_month, date_day, )
+                        elif column = 'No Value':  # TODO restrict further?
+                            column = None
                     elif column in ('No Date', 'No Time', 'No Value'):
                         # no metadata so we assume this is a date/time column
                         column = None
