@@ -12,6 +12,8 @@ The Android version of Handbase has a web interface that offers REST access to s
 
 Table of Contents
 
+- [handbase-py](#handbase-py)
+  * [Features](#features)
   * [Data and Fields](#data-and-fields)
     + [Limits](#limits)
     + [Datatypes](#datatypes)
@@ -26,9 +28,30 @@ Table of Contents
       - [Time](#time)
       - [Note](#note)
       - [Heading](#heading)
-  * [CSV](#csv)
+      - [Calculated](#calculated)
+  * [Demo](#demo)
+- [upload database, NOTE if already there will DUPLICATE records/rows!](#upload-database--note-if-already-there-will-duplicate-records-rows-)
+- [list databases](#list-databases)
+- [download CSV](#download-csv)
+- [convert into SQLite3 database, with correct encoding (utf-8)](#convert-into-sqlite3-database--with-correct-encoding--utf-8-)
+- [convert back into CSV](#convert-back-into-csv)
+  * [Web Access](#web-access)
+    + [Listing databases](#listing-databases)
+    + [Downloading databases/csv](#downloading-databases-csv)
+    + [Uploading databases/csv](#uploading-databases-csv)
+  * [CSV Notes](#csv-notes)
+    + [Existing CSV/SQLite Tools](#existing-csv-sqlite-tools)
     + [Generating CSV Files Suitable For Import Into Handbase For Android](#generating-csv-files-suitable-for-import-into-handbase-for-android)
     + [Processing CSV Files Exported From Handbase For Android](#processing-csv-files-exported-from-handbase-for-android)
+  * [HanDBase PDB](#handbase-pdb)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+## Features
+
+  * easy download from Android using HanDBase web server
+  * easy upload from Android using HanDBase web server
+  * SQLite3 import/export support, not just PDB and CSV
 
 ## Data and Fields
 
@@ -192,7 +215,7 @@ time is number of seconds for the day for math.
 
     py  -3 handbase/web/remote.py -u demo.csv
 
-## CSV
+## CSV Notes
 
 Double quotes are NOT required unless data needs to be escaped. Data that needs escaping:
   * newlines
